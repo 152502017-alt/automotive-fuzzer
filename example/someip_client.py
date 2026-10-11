@@ -7,7 +7,7 @@ from someip.constants import REQUEST
 
 def main():
 
-    target_ip = "127.0.0.1"
+    target_ip = "10.128.18.74"
     target_port = 30490
 
     message = build_someip_message(

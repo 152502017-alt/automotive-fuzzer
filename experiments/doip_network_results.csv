@@ -1,0 +1,17 @@
+test_number,test_name,packet_hex,packet_length,status,response_payload_type,latency_ms,response_or_error
+1,baseline_vehicle_identification,04fb000100000000,8,response_received,0x0004,100.587,04fb0004000000215445535456494e3132333435363738393000010102030405060102030405060000
+2,baseline_routing_activation,04fb00050000000b0e00000000000000000000,19,response_received,0x0006,137.049,04fb00060000000d00010e00100000000000000000
+3,baseline_alive_check,04fb000700000000,8,response_received,0x0008,46.265,04fb0008000000020001
+4,baseline_diagnostic_message,04fb8001000000070e00000122f190,15,response_received,0x8002,72.195,04fb80020000000500010e0000
+5,random_vehicle_identification,040c00477d000000,8,timeout,,1525.013,
+6,boundary_routing_activation,04fb00ff0000000b0e00000000000000000000,19,connection_closed,,11.25,
+7,structure_alive_check,05fb000700000000,8,connection_closed,,34.564,
+8,random_diagnostic_message,04fb8077000000070e00000122f190,15,connection_closed,,39.785,
+9,boundary_vehicle_identification,fefb000100000000,8,connection_closed,,80.365,
+10,structure_routing_activation,04fb0005000000f40e00000000000000000000,19,timeout,,1543.585,
+11,random_alive_check,04fbd807038e0000,8,timeout,,1515.014,
+12,boundary_diagnostic_message,04fb0101000000070e00000122f190,15,connection_closed,,36.654,
+13,structure_vehicle_identification,c2fb000100000000,8,connection_closed,,11.672,
+14,random_routing_activation,04fb00050000000b0e0000b000000000000000,19,response_received,0x0006,36.474,04fb00060000000d00010e00100000000000000000
+15,boundary_alive_check,04fb000700000000,8,response_received,0x0008,16.318,04fb0008000000020001
+16,structure_diagnostic_message,047b8001000000070e00000122f190,15,connection_closed,,54.668,
