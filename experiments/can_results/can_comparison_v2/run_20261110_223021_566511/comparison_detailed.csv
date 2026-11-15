@@ -1,0 +1,2 @@
+strategy,seed,total_candidates,detections,detection_rate_pct,length_mismatches,correct_rejections,faulty_acceptances
+llm_generated,42,1000,523,52.3,523,523,1000

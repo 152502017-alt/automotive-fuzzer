@@ -1,0 +1,8 @@
+{
+  "trials": 5,
+  "total_candidates": 5000,
+  "average_detection_rate_pct": 51.2,
+  "average_detections": 512.0,
+  "average_unique_candidates": 998.4,
+  "average_generation_time_sec": 10.011
+}

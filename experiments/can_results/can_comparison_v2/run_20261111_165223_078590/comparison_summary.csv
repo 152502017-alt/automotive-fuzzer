@@ -1,0 +1,8 @@
+strategy,trials,total_candidates,average_unique_candidates,average_unique_length_patterns,average_detections,average_detection_rate_pct
+llm_generated,5,5000,998.4,26.0,512.0,51.2
+random,5,5000,999.6,81.0,887.2,88.72
+boundary,5,5000,997.6,28.0,428.8,42.88
+structure,5,5000,999.4,81.0,450.0,45.0
+stateful,5,5000,990.0,81.0,530.4,53.04
+genetic,5,5000,938.0,80.8,742.4,74.24
+ml_guided,5,5000,999.6,81.0,666.0,66.6

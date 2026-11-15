@@ -1,0 +1,6 @@
+seed,llm_available,llm_proposed_pairs,fallback_candidates,generated_frames,unique_length_patterns,mismatching_patterns,matching_patterns,mismatching_frames,matching_frames,oracle_detections,detection_rate_pct
+42,True,37,0,1000,35,26,9,756,244,756,75.6
+43,True,73,0,1000,73,64,9,874,126,874,87.4
+44,True,33,0,1000,32,23,9,721,279,721,72.1
+45,True,20,0,1000,20,14,6,700,300,700,70.0
+46,True,53,0,1000,53,44,9,829,171,829,82.9

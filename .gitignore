@@ -6,3 +6,13 @@ env/
 .env
 .DS_Store
 *.log
+
+# LLM-generated candidate workspaces
+experiments/llm_candidates/
+
+# Local model and API configuration
+.env.*
+!.env.example
+
+# Temporary experiment files
+experiments/llm_results/*.tmp

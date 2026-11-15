@@ -2,8 +2,20 @@ import csv
 import hashlib
 import random
 import time
+import sys
 from pathlib import Path
 
+
+# python is importing:
+# experiments/fuzzer.py
+# instead of the intended package:
+# fuzzer this is because the current working directory is the project root.
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+from doip.error import DoIPHeaderError, DoIPPayloadError
+from someip.error import SomeIPHeaderError
 from someip.message import build_someip_message, parse_someip_message
 from someip.constants import (
     REQUEST,
@@ -211,6 +223,7 @@ def coverage_fuzzer(seeds, iterations):
     return results
 
 
+
 def genetic_fuzzer(seeds, iterations):
     population = list(seeds)
     results = []
@@ -222,12 +235,17 @@ def genetic_fuzzer(seeds, iterations):
         if len(parent1) > 1 and len(parent2) > 1:
             cut1 = random.randrange(1, len(parent1))
             cut2 = random.randrange(1, len(parent2))
-
-            child = parent1[:cut1] + parent2[cut2:]
+            child = bytearray(parent1[:cut1] + parent2[cut2:])
         else:
-            child = parent1
+            child = bytearray(parent1)
 
-        child = random_mutation(child)
+        # Keep some malformed candidates for robustness testing.
+        if len(child) >= 16 and random.random() < 0.7:
+            # SOME/IP Length = total message length - 8.
+            length = len(child) - 8
+            child[4:8] = length.to_bytes(4, "big")
+
+        child = random_mutation(bytes(child))
 
         population.append(child)
         results.append(child)
@@ -491,14 +509,18 @@ def evaluate_someip(data):
         }
 
     except Exception as exc:
+        expected_rejection = isinstance(
+            exc,
+            (
+                SomeIPHeaderError,
+                ValueError,
+            ),
+        )
         return {
             "valid": False,
-            "fault": exc.__class__.__name__
-            not in {
-                "SomeIPHeaderError",
-                "SomeIPLengthError",
-                "ValueError",
-            },
+            "fault": not expected_rejection,
+            "exception_type": exc.__class__.__name__,
+            "exception_message": str(exc),
             "state": "REJECTED",
             "transition": None,
             "behavior": (
@@ -560,14 +582,20 @@ def evaluate_doip(data, state_machine):
         }
 
     except Exception as exc:
+        expected_rejection = isinstance(
+            exc,
+            (
+                DoIPHeaderError,
+                DoIPPayloadError,
+                ValueError,
+            ),
+        )
+
         return {
             "valid": False,
-            "fault": exc.__class__.__name__
-            not in {
-                "DoIPLengthError",
-                "DoIPPayloadError",
-                "ValueError",
-            },
+            "fault": not expected_rejection,
+            "exception_type": exc.__class__.__name__,
+            "exception_message": str(exc),
             "state": "REJECTED",
             "transition": None,
             "behavior": (
@@ -652,6 +680,7 @@ def benchmark(protocol, algorithm, seeds):
     valid = 0
     invalid = 0
     faults = 0
+    fault_candidates = []
 
     states = set()
     transitions = set()
@@ -693,6 +722,14 @@ def benchmark(protocol, algorithm, seeds):
 
             if observation["fault"]:
                 faults += 1
+                fault_candidates.append({
+                    "protocol": protocol,
+                    "algorithm": algorithm,
+                    "input_sha256": hashlib.sha256(data).hexdigest(),
+                    "input_hex": data.hex(),
+                    "exception_type": observation.get("exception_type", "UNKNOWN"),
+                    "exception_message": observation.get("exception_message", ""),
+                })
 
             states.add(
                 observation["state"]
@@ -727,6 +764,7 @@ def benchmark(protocol, algorithm, seeds):
         "valid_messages": valid,
         "invalid_messages": invalid,
         "faults": faults,
+        "fault_candidates": fault_candidates,
         "unique_states": len(states),
         "state_transitions": len(transitions),
         "behavior_coverage": len(behaviors),
@@ -747,6 +785,7 @@ def benchmark(protocol, algorithm, seeds):
 
 def main():
     results = []
+    all_fault_candidates = []
 
     protocols = {
         "someip": someip_seeds(),
@@ -764,6 +803,9 @@ def main():
             )
 
             results.append(result)
+            all_fault_candidates.extend(
+                result["fault_candidates"]
+            )
 
             print(
                 f"{protocol:7} "
@@ -813,8 +855,33 @@ def main():
         )
 
         writer.writeheader()
-        writer.writerows(results)
+        writer.writerows(
+            {key: row[key] for key in fields}
+            for row in results
+            )
 
+    fault_output = (
+        Path(__file__).resolve().parent
+        / "fault_candidates.csv"
+    )
+    fault_fields = [
+        "protocol",
+        "algorithm",
+        "input_sha256",
+        "input_hex",
+        "exception_type",
+        "exception_message",
+    ]
+
+    with open(fault_output, "w", newline="") as file:
+        writer = csv.DictWriter(
+            file,
+            fieldnames=fault_fields,
+        )
+        writer.writeheader()
+        writer.writerows(all_fault_candidates)
+
+    print(f"Fault candidates saved to: {fault_output}")
     print()
     print("Fuzzing comparison completed.")
     print(f"Results saved to {output}")

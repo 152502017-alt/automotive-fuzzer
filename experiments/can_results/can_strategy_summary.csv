@@ -1,0 +1,9 @@
+strategy,trials,average_budget,average_unique_candidates,average_detections,average_detection_rate_pct,average_execution_time_sec
+random,5,1000.0,999.6,887.2,88.72,0.0012
+boundary,5,1000.0,997.6,428.8,42.88,0.0013
+structure,5,1000.0,999.4,450.0,45.0,0.0012
+stateful,5,1000.0,990.0,530.4,53.04,0.0012
+coverage,5,1000.0,999.6,887.2,88.72,0.0013
+genetic,5,1000.0,938.0,742.4,74.24,0.0034
+ml_guided,5,1000.0,999.6,666.0,66.6,0.0013
+llm_generated,5,1000.0,997.0,539.0,53.9,6.8921
